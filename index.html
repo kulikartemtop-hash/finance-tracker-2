@@ -6,8 +6,9 @@
     <meta name="theme-color" content="#1a1a2e">
     <title>Finanze | Умные финансы</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Встроенный Chart.js (без CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -46,11 +47,21 @@
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="month"><i class="fas fa-calendar-alt"></i> Месяц</button>
                     <button class="filter-btn" data-filter="week"><i class="fas fa-clock"></i> Неделя</button>
-                    <button class="filter-btn" data-filter="today"><i class="fas fa-sun"></i> Сегодня</button>
-                </div>            </div>
+                    <button class="filter-btn" data-filter="today"><i class="fas fa-sun"></i> Сегодня</button>                </div>
+            </div>
 
             <div class="card">
                 <h3><i class="fas fa-plus"></i> Добавить расход</h3>
+                <div class="sms-parse-section">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">
+                        <i class="fas fa-comment-dots"></i> Вставьте СМС от банка:
+                    </p>
+                    <textarea id="smsTextInput" placeholder="Например: Покупка 1 250,00 ₽. Баланс: 10 000 ₽" rows="2"></textarea>
+                    <button class="btn-parse-sms" id="parseSmsBtn">
+                        <i class="fas fa-magic"></i> Распознать СМС
+                    </button>
+                </div>
+
                 <div class="input-group">
                     <select id="accountSelect"></select>
                     <input type="number" id="amountInput" placeholder="Сумма (₽)" step="0.01">
@@ -64,7 +75,14 @@
                         <option value="🏠 Дом">
                         <option value="📦 Другое">
                     </datalist>
-                    <input type="text" id="descInput" placeholder="Описание (например: Пятерочка)">
+                    <input list="subcategoriesList" id="subcategoryInput" placeholder="Подкатегория (необяз.)">
+                    <datalist id="subcategoriesList">
+                        <option value="Пятерочка">
+                        <option value="Яндекс Такси">
+                        <option value="Кофейня">
+                        <option value="Аптека">
+                    </datalist>
+                    <input type="text" id="descInput" placeholder="Описание">
                     <button class="btn-add btn-expense" id="addBtn">
                         <i class="fas fa-paper-plane"></i> Записать
                     </button>
@@ -73,36 +91,61 @@
 
             <div class="card">
                 <h3><i class="fas fa-history"></i> История операций</h3>
-                <ul id="transactionList" class="transaction-list"></ul>
-                <p id="emptyState" class="empty-state">
-                    <i class="far fa-folder-open"></i> Нет операций за этот период
-                </p>
+                <div class="view-toggles">
+                    <button class="view-toggle-btn active" data-chart-type="list"><i class="fas fa-list"></i> Список</button>
+                    <button class="view-toggle-btn" data-chart-type="bar"><i class="fas fa-chart-bar"></i> Столбцы</button>
+                    <button class="view-toggle-btn" data-chart-type="pie"><i class="fas fa-pie-chart"></i> Круг</button>
+                </div>
+                <div id="listViewContainer">
+                    <ul id="transactionList" class="transaction-list"></ul>
+                    <p id="emptyState" class="empty-state">
+                        <i class="far fa-folder-open"></i> Нет операций за этот период
+                    </p>
+                </div>
+
+                <div id="chartViewContainer" style="display: none; padding: 10px 0;">
+                    <canvas id="expenseChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ДОХОДЫ -->
+    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->
     <div id="incomeView" class="view">
         <div class="app-container">
             <header class="header">
-                <h1><i class="fas fa-arrow-up"></i> Доходы</h1>
+                <h1><i class="fas fa-arrow-up"></i> Доходы & Переводы</h1>
                 <div class="balance-card income-card">
                     <span>Доход за месяц</span>
                     <h2 id="monthIncomeTotal">0.00 ₽</h2>
                 </div>
             </header>
+
             <div class="card">
                 <h3><i class="fas fa-plus"></i> Добавить доход</h3>
                 <div class="input-group">
                     <select id="incomeAccountSelect"></select>
                     <input type="number" id="incomeAmountInput" placeholder="Сумма (₽)" step="0.01">
-                    <input type="text" id="incomeDescInput" placeholder="Описание (например: Зарплата)">                    <button class="btn-add btn-income" id="addIncomeBtn">
+                    <input type="text" id="incomeDescInput" placeholder="Описание">
+                    <button class="btn-add btn-income" id="addIncomeBtn">
                         <i class="fas fa-money-bill-wave"></i> Зачислить
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <div class="card transfer-card">
+                <h3><i class="fas fa-exchange-alt"></i> Перевод между счетами</h3>
+                <div class="input-group">
+                    <select id="transferFromSelect"></select>
+                    <div style="text-align: center; color: var(--text-secondary); font-size: 24px;">⬇️</div>
+                    <select id="transferToSelect"></select>
+                    <input type="number" id="transferAmountInput" placeholder="Сумма (₽)" step="0.01">
+                    <button class="btn-add btn-transfer" id="transferBtn">
+                        <i class="fas fa-sync-alt"></i> Перевести
+                    </button>
+                </div>
+            </div>
+        </div>    </div>
 
     <!-- НИЖНЕЕ МЕНЮ -->
     <nav class="bottom-nav">
