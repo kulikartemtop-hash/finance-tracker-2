@@ -1,13 +1,11 @@
+// === ЧАСТЬ 1: Инициализация, Счета, Цели и Категории ===
+
 // Элементы DOM
 const views = document.querySelectorAll('.view');
 const navBtns = document.querySelectorAll('.nav-btn');
-
-// Счета
 const totalBalanceEl = document.getElementById('totalBalance');
 const accountsList = document.getElementById('accountsList');
 const addAccountBtn = document.getElementById('addAccountBtn');
-
-// Расходы
 const periodLabel = document.getElementById('periodLabel');
 const periodTotal = document.getElementById('periodTotal');
 const filterBtns = document.querySelectorAll('.filter-btn');
@@ -25,16 +23,11 @@ const descInput = document.getElementById('descInput');
 const addBtn = document.getElementById('addBtn');
 const transactionList = document.getElementById('transactionList');
 const emptyState = document.getElementById('emptyState');
-
-// Графики
 const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
 const listViewContainer = document.getElementById('listViewContainer');
 const chartViewContainer = document.getElementById('chartViewContainer');
 const categoriesList = document.getElementById('categoriesList');
 const subcategoriesList = document.getElementById('subcategoriesList');
-let expenseChartInstance = null;
-
-// Доходы и Переводы (упрощенные элементы для фокуса на главном)
 const monthIncomeTotal = document.getElementById('monthIncomeTotal');
 const incomeTypeSelect = document.getElementById('incomeTypeSelect');
 const incomeDescInput = document.getElementById('incomeDescInput');
@@ -46,14 +39,15 @@ const transferToSelect = document.getElementById('transferToSelect');
 const transferAmountInput = document.getElementById('transferAmountInput');
 const transferBtn = document.getElementById('transferBtn');
 
-// Состояние
-let accounts = [];let transactions = [];
+// Состояние приложения
+let accounts = [];
+let transactions = [];
 let customCategories = ['🛒 Продукты', '🚕 Транспорт', '🍔 Кафе', '💊 Здоровье', '🛍️ Покупки', '🏠 Дом', '📦 Другое'];
 let currentFilter = 'month';
-let currentHistoryView = 'list'; // 'list', 'bar', 'pie'
+let currentHistoryView = 'list';
+let expenseChartInstance = null;
 
-// 1. Инициализация
-function loadData() {
+// 1. Загрузка данных с защитой от ошибокfunction loadData() {
     try {
         const savedAccounts = localStorage.getItem('finance_accounts');
         const savedTransactions = localStorage.getItem('finance_transactions');
@@ -68,8 +62,9 @@ function loadData() {
         transactions = savedTransactions ? JSON.parse(savedTransactions) : [];
         if (savedCategories) customCategories = JSON.parse(savedCategories);
         
-        saveData(); // Сохраняем структуру с goals, если её не было
+        saveData();
     } catch (error) {
+        console.error("Ошибка загрузки, сброс:", error);
         localStorage.clear();
         location.reload();
         return;
@@ -96,14 +91,14 @@ navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         views.forEach(v => v.classList.remove('active'));
         document.getElementById(btn.dataset.view).classList.add('active');
-        navBtns.forEach(b => b.classList.remove('active'));        btn.classList.add('active');
+        navBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
     });
 });
 
-// 3. Логика Счетов и Целей
-function renderAccounts() {
+// 3. Логика Счетов и Целейfunction renderAccounts() {
     accountsList.innerHTML = '';
-    let totalWorkingBalance = 0; // Считаем ТОЛЬКО рабочие балансы, игнорируя цели!
+    let totalWorkingBalance = 0;
     
     accounts.forEach(acc => {
         totalWorkingBalance += acc.balance;
@@ -138,19 +133,19 @@ function renderAccounts() {
 }
 
 window.addGoal = function(accountId) {
-    const name = prompt("Название цели (например: Отпуск, Подушка безопасности):");
+    const name = prompt("Название цели (например: Отпуск):");
     if (!name) return;
     const target = parseFloat(prompt("Целевая сумма (₽):"));
     if (!target || target <= 0) return alert("Введите корректную сумму");
 
     const acc = accounts.find(a => a.id === accountId);
     if (!acc.goals) acc.goals = [];
-    acc.goals.push({ id: Date.now(), name: name.trim(), targetAmount: target, currentAmount: 0 });    saveData();
+    acc.goals.push({ id: Date.now(), name: name.trim(), targetAmount: target, currentAmount: 0 });
+    saveData();
 };
 
 function updateAllAccountSelects() {
-    [accountSelect, incomeAccountSelect, transferFromSelect, transferToSelect].forEach(select => {
-        const currentVal = select.value;
+    [accountSelect, incomeAccountSelect, transferFromSelect, transferToSelect].forEach(select => {        const currentVal = select.value;
         select.innerHTML = '';
         accounts.forEach(acc => {
             const option = document.createElement('option');
@@ -171,12 +166,12 @@ addAccountBtn.addEventListener('click', () => {
     }
 });
 
-// 4. Категории (Пользовательские)
+// 4. Категории
 function renderCategoriesDatalist() {
     categoriesList.innerHTML = customCategories.map(c => `<option value="${c}">`).join('');
-    // Подкатегории пока берем из существующих категорий для простоты, или пользователь введет свои
     subcategoriesList.innerHTML = customCategories.map(c => `<option value="${c}">`).join('');
 }
+// === ЧАСТЬ 2: Расходы, Графики, СМС, Доходы и Удаление ===
 
 // 5. Расходы и Графики
 filterBtns.forEach(btn => {
@@ -194,7 +189,8 @@ viewToggleBtns.forEach(btn => {
         viewToggleBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        if (currentHistoryView === 'list') {            listViewContainer.style.display = 'block';
+        if (currentHistoryView === 'list') {
+            listViewContainer.style.display = 'block';
             chartViewContainer.style.display = 'none';
         } else {
             listViewContainer.style.display = 'none';
@@ -224,8 +220,7 @@ function renderExpenses() {
         const li = document.createElement('li');
         li.className = 'transaction-item';
         const sub = t.subcategory ? `<span class="t-sub">${t.subcategory}</span>` : '';
-        li.innerHTML = `
-            <div class="t-info">
+        li.innerHTML = `            <div class="t-info">
                 <span class="t-desc">${t.category}</span>
                 ${sub}
                 <span class="t-date">${t.date} • ${acc.icon} ${acc.name}</span>
@@ -243,9 +238,7 @@ function renderExpenses() {
     periodLabel.textContent = `Расход ${periodNames[currentFilter].toLowerCase()}`;
     periodTotal.textContent = periodSum.toFixed(2) + ' ₽';
 
-    // Если активен вид графика, обновляем его    if (currentHistoryView !== 'list') {
-        renderChart(currentHistoryView);
-    }
+    if (currentHistoryView !== 'list') renderChart(currentHistoryView);
 }
 
 function renderChart(type) {
@@ -253,8 +246,6 @@ function renderChart(type) {
     if (expenseChartInstance) expenseChartInstance.destroy();
 
     const filteredTx = transactions.filter(t => t.type === 'expense' && isDateInFilter(t.date, currentFilter));
-    
-    // Агрегация данных по категориям
     const dataMap = {};
     filteredTx.forEach(t => {
         const key = t.subcategory ? `${t.category}: ${t.subcategory}` : t.category;
@@ -278,10 +269,7 @@ function renderChart(type) {
             }]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: { position: type === 'pie' ? 'bottom' : 'top' }
-            }
+            responsive: true,            plugins: { legend: { position: type === 'pie' ? 'bottom' : 'top' } }
         }
     });
 }
@@ -289,12 +277,10 @@ function renderChart(type) {
 // 6. Добавление расхода
 function addExpenseLogic(amount, accountId, category, subcategory, description) {
     if (!amount || amount <= 0) return alert('Введите корректную сумму');
-
-    // Сохраняем новые категории, если их нет
     if (!customCategories.includes(category)) {
-        customCategories.push(category);        renderCategoriesDatalist();
+        customCategories.push(category);
+        renderCategoriesDatalist();
     }
-
     const account = accounts.find(a => a.id === accountId);
     if (account) account.balance -= amount;
 
@@ -302,20 +288,13 @@ function addExpenseLogic(amount, accountId, category, subcategory, description) 
         id: Date.now(), type: 'expense', accountId, amount, category, subcategory: subcategory || '', description, 
         date: new Date().toLocaleDateString('ru-RU') 
     });
-    
     saveData();
     updateAllAccountSelects();
     amountInput.value = ''; categoryInput.value = ''; subcategoryInput.value = ''; descInput.value = '';
 }
 
 addBtn.addEventListener('click', () => {
-    addExpenseLogic(
-        parseFloat(amountInput.value),
-        parseInt(accountSelect.value),
-        categoryInput.value.trim() || '📦 Другое',
-        subcategoryInput.value.trim(),
-        descInput.value.trim()
-    );
+    addExpenseLogic(parseFloat(amountInput.value), parseInt(accountSelect.value), categoryInput.value.trim() || '📦 Другое', subcategoryInput.value.trim(), descInput.value.trim());
 });
 
 // 7. Распознавание СМС
@@ -337,11 +316,12 @@ parseSmsBtn.addEventListener('click', async () => {
 
     const lowerText = text.toLowerCase();
     let detectedCategory = '📦 Другое';
-    for (const [category, keywords] of Object.entries({'🛒 Продукты': ['пятерочка', 'магнит', 'ашан', 'вкусвилл'], '🚕 Транспорт': ['яндекс', 'такси', 'метро', 'бензин'], '🍔 Кафе': ['кафе', 'ресторан', 'кофе', 'вкусно']})) {
-        if (keywords.some(k => lowerText.includes(k))) { detectedCategory = category; break; }
-    }
+    const keywordsMap = {'🛒 Продукты': ['пятерочка', 'магнит', 'ашан', 'вкусвилл'], '🚕 Транспорт': ['яндекс', 'такси', 'метро', 'бензин'], '🍔 Кафе': ['кафе', 'ресторан', 'кофе', 'вкусно']};
+    for (const [category, keywords] of Object.entries(keywordsMap)) {
+        if (keywords.some(k => lowerText.includes(k))) { detectedCategory = category; break; }    }
 
-    amountInput.value = foundAmount;    categoryInput.value = detectedCategory;
+    amountInput.value = foundAmount;
+    categoryInput.value = detectedCategory;
     descInput.value = `СМС: ${text.substring(0, 30)}...`;
     smsTextInput.value = '';
     if (navigator.vibrate) navigator.vibrate(50);
@@ -365,13 +345,12 @@ window.deleteItem = function(id) {
         if (fromAcc) fromAcc.balance += tx.amount;
         if (toAcc) toAcc.balance -= tx.amount;
     }
-
     transactions = transactions.filter(t => t.id !== id);
     saveData();
     updateAllAccountSelects();
 };
 
-// 9. Доходы и Переводы (Базовая логика)
+// 9. Доходы и Переводы
 addIncomeBtn.addEventListener('click', () => {
     const amount = parseFloat(incomeAmountInput.value);
     const accountId = parseInt(incomeAccountSelect.value);
@@ -388,9 +367,9 @@ transferBtn.addEventListener('click', () => {
     const amount = parseFloat(transferAmountInput.value);
     if (fromId === toId) return alert('Выберите разные счета');
     if (!amount || amount <= 0) return alert('Введите сумму');
-    const fromAcc = accounts.find(a => a.id === fromId);
-    const toAcc = accounts.find(a => a.id === toId);
-    if (fromAcc.balance < amount) return alert('Недостаточно средств');    
+    const fromAcc = accounts.find(a => a.id === fromId);    const toAcc = accounts.find(a => a.id === toId);
+    if (fromAcc.balance < amount) return alert('Недостаточно средств');
+    
     fromAcc.balance -= amount; toAcc.balance += amount;
     transactions.push({ id: Date.now(), type: 'transfer', fromAccountId: fromId, toAccountId: toId, amount, description: `${fromAcc.name} → ${toAcc.name}`, date: new Date().toLocaleDateString('ru-RU') });
     saveData(); updateAllAccountSelects(); transferAmountInput.value = '';
@@ -408,5 +387,5 @@ function renderIncomesAndTransfers() {
     monthIncomeTotal.textContent = monthSum.toFixed(2) + ' ₽';
 }
 
-// Запуск
+// Запуск приложения
 loadData();
