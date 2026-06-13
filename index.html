@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#007aff">
-    <title>Мои Финансы</title>
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Finanze | Умные финансы</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- ВКЛАДКА 1: СЧЕТА И ЦЕЛИ -->
+    <!-- ВКЛАДКА 1: СЧЕТА -->
     <div id="accountsView" class="view active">
         <div class="app-container">
             <header class="header">
-                <h1>🏦 Мои Счета</h1>
+                <h1><i class="fas fa-piggy-bank"></i> Мои Счета</h1>
                 <div class="balance-card">
                     <span>Общий рабочий баланс</span>
                     <h2 id="totalBalance">0.00 ₽</h2>
                 </div>
             </header>
             <div class="card">
-                <h3>Ваши счета</h3>
+                <h3><i class="fas fa-wallet"></i> Ваши счета</h3>
                 <ul id="accountsList" class="accounts-list"></ul>
-                <button class="btn-add-account" id="addAccountBtn">+ Добавить счет</button>
+                <button class="btn-add-account" id="addAccountBtn">
+                    <i class="fas fa-plus-circle"></i> Добавить счет
+                </button>
             </div>
         </div>
     </div>
@@ -33,7 +35,7 @@
     <div id="expensesView" class="view">
         <div class="app-container">
             <header class="header">
-                <h1>📊 Расходы</h1>
+                <h1><i class="fas fa-shopping-cart"></i> Расходы</h1>
                 <div class="balance-card expense-card">
                     <span id="periodLabel">Расход за месяц</span>
                     <h2 id="periodTotal">0.00 ₽</h2>
@@ -42,110 +44,82 @@
             
             <div class="card">
                 <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="month">Месяц</button>
-                    <button class="filter-btn" data-filter="week">Неделя</button>
-                    <button class="filter-btn" data-filter="today">Сегодня</button>
-                </div>
-            </div>
-            <div class="card">
-                <h3>📸 Добавить расход</h3>
-                <div class="sms-parse-section">
-                    <p style="font-size: 13px; color: #666; margin-bottom: 6px;">💡 Вставьте текст СМС от банка:</p>
-                    <textarea id="smsTextInput" placeholder="Например: Покупка 1 250,00 ₽. Баланс: 10 000 ₽" rows="2"></textarea>
-                    <button class="btn-parse-sms" id="parseSmsBtn">📋 Распознать СМС</button>
-                </div>
+                    <button class="filter-btn active" data-filter="month"><i class="fas fa-calendar-alt"></i> Месяц</button>
+                    <button class="filter-btn" data-filter="week"><i class="fas fa-clock"></i> Неделя</button>
+                    <button class="filter-btn" data-filter="today"><i class="fas fa-sun"></i> Сегодня</button>
+                </div>            </div>
 
-                <input type="file" id="cameraInput" accept="image/*" capture="environment">
-                <button class="btn-scan" id="scanBtn">Сканировать чек</button>
-                <div id="loading" class="loading" style="display: none;">⏳ Распознаю... <span id="progress">0</span>%</div>
-                
+            <div class="card">
+                <h3><i class="fas fa-plus"></i> Добавить расход</h3>
                 <div class="input-group">
                     <select id="accountSelect"></select>
                     <input type="number" id="amountInput" placeholder="Сумма (₽)" step="0.01">
-                    
-                    <input list="categoriesList" id="categoryInput" placeholder="Категория (например: Еда)">
-                    <datalist id="categoriesList"></datalist>
-                    
-                    <input list="subcategoriesList" id="subcategoryInput" placeholder="Подкатегория (необязательно)">
-                    <datalist id="subcategoriesList"></datalist>
-                    
-                    <input type="text" id="descInput" placeholder="Описание / Комментарий">
-                    <button class="btn-add btn-expense" id="addBtn">Добавить расход</button>
+                    <input list="categoriesList" id="categoryInput" placeholder="Категория">
+                    <datalist id="categoriesList">
+                        <option value="🛒 Продукты">
+                        <option value="🚕 Транспорт">
+                        <option value="🍔 Кафе">
+                        <option value="💊 Здоровье">
+                        <option value="🛍️ Покупки">
+                        <option value="🏠 Дом">
+                        <option value="📦 Другое">
+                    </datalist>
+                    <input type="text" id="descInput" placeholder="Описание (например: Пятерочка)">
+                    <button class="btn-add btn-expense" id="addBtn">
+                        <i class="fas fa-paper-plane"></i> Записать
+                    </button>
                 </div>
             </div>
 
             <div class="card">
-                <h3>📜 История операций</h3>
-                <div class="view-toggles">
-                    <button class="view-toggle-btn active" data-chart-type="list">📝 Список</button>
-                    <button class="view-toggle-btn" data-chart-type="bar">📊 Столбцы</button>
-                    <button class="view-toggle-btn" data-chart-type="pie">🥧 Круг</button>
-                </div>
-
-                <div id="listViewContainer">
-                    <ul id="transactionList" class="transaction-list"></ul>
-                    <p id="emptyState" class="empty-state">Нет операций за этот период</p>
-                </div>
-
-                <div id="chartViewContainer" style="display: none; padding: 10px 0;">
-                    <canvas id="expenseChart"></canvas>
-                </div>
+                <h3><i class="fas fa-history"></i> История операций</h3>
+                <ul id="transactionList" class="transaction-list"></ul>
+                <p id="emptyState" class="empty-state">
+                    <i class="far fa-folder-open"></i> Нет операций за этот период
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->
+    <!-- ВКЛАДКА 3: ДОХОДЫ -->
     <div id="incomeView" class="view">
-        <div class="app-container">            <header class="header">
-                <h1>💸 Доходы и Переводы</h1>
+        <div class="app-container">
+            <header class="header">
+                <h1><i class="fas fa-arrow-up"></i> Доходы</h1>
                 <div class="balance-card income-card">
                     <span>Доход за месяц</span>
                     <h2 id="monthIncomeTotal">0.00 ₽</h2>
                 </div>
             </header>
             <div class="card">
-                <h3>➕ Добавить доход</h3>
+                <h3><i class="fas fa-plus"></i> Добавить доход</h3>
                 <div class="input-group">
-                    <select id="incomeTypeSelect">
-                        <option value="💼 Зарплата">💼 Зарплата</option>
-                        <option value="🎁 Подарок">🎁 Подарок</option>
-                        <option value="💸 Кэшбэк">💸 Кэшбэк / Возврат</option>
-                        <option value="✍️ Другое">✍️ Другое</option>
-                    </select>
-                    <input type="text" id="incomeDescInput" placeholder="Описание">
                     <select id="incomeAccountSelect"></select>
                     <input type="number" id="incomeAmountInput" placeholder="Сумма (₽)" step="0.01">
-                    <button class="btn-add btn-income" id="addIncomeBtn">Зачислить доход</button>
-                </div>
-            </div>
-            <div class="card transfer-card">
-                <h3>🔄 Перевод между счетами</h3>
-                <div class="input-group">
-                    <select id="transferFromSelect"></select>
-                    <div style="text-align: center; color: #8e8e93; font-size: 20px; margin: -5px 0;">⬇️</div>
-                    <select id="transferToSelect"></select>
-                    <input type="number" id="transferAmountInput" placeholder="Сумма перевода (₽)" step="0.01">
-                    <button class="btn-add btn-transfer" id="transferBtn">Перевести</button>
+                    <input type="text" id="incomeDescInput" placeholder="Описание (например: Зарплата)">                    <button class="btn-add btn-income" id="addIncomeBtn">
+                        <i class="fas fa-money-bill-wave"></i> Зачислить
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
+    <!-- НИЖНЕЕ МЕНЮ -->
     <nav class="bottom-nav">
         <button class="nav-btn active" data-view="accountsView">
-            <span>🏦</span>
+            <i class="fas fa-home"></i>
             <span>Счета</span>
         </button>
         <button class="nav-btn" data-view="expensesView">
-            <span>📊</span>
+            <i class="fas fa-chart-bar"></i>
             <span>Расходы</span>
         </button>
         <button class="nav-btn" data-view="incomeView">
-            <span>💸</span>
+            <i class="fas fa-hand-holding-usd"></i>
             <span>Доходы</span>
         </button>
     </nav>
+
     <script src="app.js"></script>
 </body>
 </html>
