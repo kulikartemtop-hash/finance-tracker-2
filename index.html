@@ -6,9 +6,10 @@
     <meta name="theme-color" content="#007aff">
     <title>Мои Финансы</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Подключаем библиотеку для графиков -->
+    <!-- Библиотека для графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></>
+    <!-- Библиотека для распознавания текста -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -46,8 +47,8 @@
                     <button class="filter-btn active" data-filter="month">Месяц</button>
                     <button class="filter-btn" data-filter="week">Неделя</button>
                     <button class="filter-btn" data-filter="today">Сегодня</button>
-                </div>
-            </div>
+                </div>            </div>
+
             <div class="card">
                 <h3>📸 Добавить расход</h3>
                 <div class="sms-parse-section">
@@ -64,11 +65,10 @@
                     <select id="accountSelect"></select>
                     <input type="number" id="amountInput" placeholder="Сумма (₽)" step="0.01">
                     
-                    <!-- Умные поля для категорий (можно выбрать или написать своё) -->
                     <input list="categoriesList" id="categoryInput" placeholder="Категория (например: Еда)">
                     <datalist id="categoriesList"></datalist>
                     
-                    <input list="subcategoriesList" id="subcategoryInput" placeholder="Подкатегория (необязательно, например: Рестораны)">
+                    <input list="subcategoriesList" id="subcategoryInput" placeholder="Подкатегория (необязательно)">
                     <datalist id="subcategoriesList"></datalist>
                     
                     <input type="text" id="descInput" placeholder="Описание / Комментарий">
@@ -78,28 +78,25 @@
 
             <div class="card">
                 <h3>📜 История операций</h3>
-                <!-- Переключатель видов -->
                 <div class="view-toggles">
                     <button class="view-toggle-btn active" data-chart-type="list">📝 Список</button>
                     <button class="view-toggle-btn" data-chart-type="bar">📊 Столбцы</button>
                     <button class="view-toggle-btn" data-chart-type="pie">🥧 Круг</button>
                 </div>
 
-                <!-- Контейнер для списка -->
                 <div id="listViewContainer">
                     <ul id="transactionList" class="transaction-list"></ul>
                     <p id="emptyState" class="empty-state">Нет операций за этот период</p>
                 </div>
 
-                <!-- Контейнер для графиков -->
                 <div id="chartViewContainer" style="display: none; padding: 10px 0;">
                     <canvas id="expenseChart"></canvas>
                 </div>
             </div>
-        </div>    </div>
+        </div>
+    </div>
 
-    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ (Оставлена без изменений для краткости, но работает) -->
-    <div id="incomeView" class="view">
+    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->    <div id="incomeView" class="view">
         <div class="app-container">
             <header class="header">
                 <h1>💸 Доходы и Переводы</h1>
