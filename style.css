@@ -22,7 +22,6 @@ body {
 .card h3 { font-size: 18px; margin-bottom: 15px; }
 .transfer-card { border: 2px solid #007aff; background: #f0f8ff; }
 
-/* Счета и Цели */
 .accounts-list { list-style: none; margin-bottom: 15px; }
 .account-item { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid #f2f2f7; }
 .account-item:last-child { border-bottom: none; }
@@ -38,15 +37,12 @@ body {
 .goal-name { color: #5856d6; font-weight: 500; }
 .goal-amount { color: #1c1c1e; font-weight: 600; }
 .btn-add-goal { width: 100%; background: transparent; color: #5856d6; border: 1px dashed #5856d6; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-
 .btn-add-account { width: 100%; background: #f2f2f7; color: #007aff; border: 1px dashed #007aff; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
 
-/* Фильтры и переключатели видов */
 .filter-buttons, .view-toggles { display: flex; gap: 8px; background: #f2f2f7; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
 .filter-btn, .view-toggle-btn { flex: 1; background: transparent; border: none; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #8e8e93; cursor: pointer; transition: 0.2s; }
 .filter-btn.active, .view-toggle-btn.active { background: white; color: #1c1c1e; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-/* Формы */
 #cameraInput { display: none; }
 .btn-scan { width: 100%; background: #34c759; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 15px; }
 .btn-scan:disabled { background: #a0a0a5; }
@@ -64,7 +60,6 @@ body {
 #smsTextInput { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 14px; resize: none; font-family: inherit; background: #f9f9f9; }
 .btn-parse-sms { width: 100%; background: #5856d6; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
 
-/* Списки */
 .transaction-list { list-style: none; }
 .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f2f2f7; }
 .transaction-item:last-child { border-bottom: none; }
@@ -80,7 +75,6 @@ body {
 .loading { text-align: center; color: #007aff; font-weight: bold; margin: 10px 0; }
 .empty-state { text-align: center; color: #8e8e93; padding: 20px 0; font-size: 14px; }
 
-/* Навигация */
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #e5e5ea; display: flex; justify-content: space-around; padding: 10px 0 20px 0; max-width: 500px; margin: 0 auto; z-index: 100; }
 .nav-btn { background: none; border: none; font-size: 11px; font-weight: 600; color: #8e8e93; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; padding: 5px; }
 .nav-btn.active { color: #007aff; }
