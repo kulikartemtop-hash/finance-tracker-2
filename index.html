@@ -3,12 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#1e293b">
     <title>Finanze | Умные финансы</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Встроенный Chart.js (без CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #34d399;
+            --danger: #f87171;
+            --gray: #334155;
+            --border: #475569;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 90px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--text);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 24px 20px;
+            border-radius: 20px;
+            box-shadow: 0 12px 32px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .balance-card span {
+            font-size: 14px;
+            opacity: 0.9;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .balance-card h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            transition: all 0.3s ease;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px var(--shadow); }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+        }
+        .btn-add-account,
+        .btn-add,
+        .btn-parse-sms,
+        .btn-transfer {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(75, 85, 99, 0.3);
+        }
+        .btn-add-account:hover,
+        .btn-add:hover,
+        .btn-parse-sms:hover,
+        .btn-transfer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(75, 85, 99, 0.4);
+        }
+        .btn-expense {
+            background: linear-gradient(135deg, var(--danger), #e53e3e);
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+        .btn-income {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+        }
+        .btn-transfer {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+        .nav-btn {
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.05); }
+        .nav-btn.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.15);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        .nav-btn i { font-size: 22px; }
+
+        .accounts-list { list-style: none; }
+        .account-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .account-item:last-child { border-bottom: none; }
+        .acc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .acc-info { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+        .acc-icon { font-size: 24px; }
+        .acc-balance { font-weight: 700; font-size: 18px; }
+
+        .goals-section {
+            background: rgba(99, 102, 241, 0.08);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+        }
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+        }        .goal-item:last-child { border-bottom: none; }
+        .goal-name { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .goal-amount { font-weight: 600; }
+        .btn-add-goal {
+            width: 100%;
+            background: transparent;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .input-group input,
+        .input-group select {
+            padding: 16px 16px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 16px;
+            background: var(--card);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .transaction-list { list-style: none; }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .transaction-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;        }
+        .t-desc { font-weight: 600; color: var(--text); }
+        .t-sub { font-size: 13px; color: var(--primary); margin-top: 4px; }
+        .t-date { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .t-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .t-amount.expense { color: var(--danger); }
+        .t-amount.income { color: var(--success); }
+        .t-amount.transfer { color: #8b5cf6; }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 0;
+            font-size: 16px;
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; color: var(--text-secondary); }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 22px; }
+            .balance-card h2 { font-size: 32px; }
+            .card { padding: 20px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -24,7 +284,40 @@
             </header>
             <div class="card">
                 <h3><i class="fas fa-wallet"></i> Ваши счета</h3>
-                <ul id="accountsList" class="accounts-list"></ul>
+                <ul id="accountsList" class="accounts-list">
+                    <li class="account-item">
+                        <div class="acc-header">
+                            <div class="acc-info"><span>🏦</span><span>Т-Банк</span></div>
+                            <div class="acc-balance">0.00 ₽</div>
+                        </div>
+                        <div class="goals-section">
+                            <button class="btn-add-goal" onclick="addGoal(1)">
+                                <i class="fas fa-plus"></i> Добавить цель                            </button>
+                        </div>
+                    </li>
+                    <li class="account-item">
+                        <div class="acc-header">
+                            <div class="acc-info"><span>💳</span><span>Сбербанк</span></div>
+                            <div class="acc-balance">0.00 ₽</div>
+                        </div>
+                        <div class="goals-section">
+                            <button class="btn-add-goal" onclick="addGoal(2)">
+                                <i class="fas fa-plus"></i> Добавить цель
+                            </button>
+                        </div>
+                    </li>
+                    <li class="account-item">
+                        <div class="acc-header">
+                            <div class="acc-info"><span>💵</span><span>Наличные</span></div>
+                            <div class="acc-balance">0.00 ₽</div>
+                        </div>
+                        <div class="goals-section">
+                            <button class="btn-add-goal" onclick="addGoal(3)">
+                                <i class="fas fa-plus"></i> Добавить цель
+                            </button>
+                        </div>
+                    </li>
+                </ul>
                 <button class="btn-add-account" id="addAccountBtn">
                     <i class="fas fa-plus-circle"></i> Добавить счет
                 </button>
@@ -47,8 +340,8 @@
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="month"><i class="fas fa-calendar-alt"></i> Месяц</button>
                     <button class="filter-btn" data-filter="week"><i class="fas fa-clock"></i> Неделя</button>
-                    <button class="filter-btn" data-filter="today"><i class="fas fa-sun"></i> Сегодня</button>                </div>
-            </div>
+                    <button class="filter-btn" data-filter="today"><i class="fas fa-sun"></i> Сегодня</button>
+                </div>            </div>
 
             <div class="card">
                 <h3><i class="fas fa-plus"></i> Добавить расход</h3>
@@ -63,7 +356,11 @@
                 </div>
 
                 <div class="input-group">
-                    <select id="accountSelect"></select>
+                    <select id="accountSelect">
+                        <option value="1">🏦 Т-Банк (0.00 ₽)</option>
+                        <option value="2">💳 Сбербанк (0.00 ₽)</option>
+                        <option value="3">💵 Наличные (0.00 ₽)</option>
+                    </select>
                     <input type="number" id="amountInput" placeholder="Сумма (₽)" step="0.01">
                     <input list="categoriesList" id="categoryInput" placeholder="Категория">
                     <datalist id="categoriesList">
@@ -93,38 +390,39 @@
                 <h3><i class="fas fa-history"></i> История операций</h3>
                 <div class="view-toggles">
                     <button class="view-toggle-btn active" data-chart-type="list"><i class="fas fa-list"></i> Список</button>
-                    <button class="view-toggle-btn" data-chart-type="bar"><i class="fas fa-chart-bar"></i> Столбцы</button>
-                    <button class="view-toggle-btn" data-chart-type="pie"><i class="fas fa-pie-chart"></i> Круг</button>
+                    <button class="view-toggle-btn" data-chart-type="bar"><i class="fas fa-chart-bar"></i> Столбцы</button>                    <button class="view-toggle-btn" data-chart-type="pie"><i class="fas fa-pie-chart"></i> Круг</button>
                 </div>
-                <div id="listViewContainer">
-                    <ul id="transactionList" class="transaction-list"></ul>
-                    <p id="emptyState" class="empty-state">
-                        <i class="far fa-folder-open"></i> Нет операций за этот период
-                    </p>
-                </div>
-
-                <div id="chartViewContainer" style="display: none; padding: 10px 0;">
-                    <canvas id="expenseChart"></canvas>
-                </div>
+                <ul id="transactionList" class="transaction-list">
+                    <li class="transaction-item">
+                        <div><div class="t-desc">🛒 Продукты</div><div class="t-date">Покупка в магазине</div></div>
+                        <div class="t-amount expense">-250.00 ₽</div>
+                    </li>
+                </ul>
+                <p id="emptyState" class="empty-state" style="display:none;">
+                    <i class="far fa-folder-open"></i> Нет операций за этот период
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->
+    <!-- ВКЛАДКА 3: ДОХОДЫ -->
     <div id="incomeView" class="view">
         <div class="app-container">
             <header class="header">
-                <h1><i class="fas fa-arrow-up"></i> Доходы & Переводы</h1>
+                <h1><i class="fas fa-arrow-up"></i> Доходы</h1>
                 <div class="balance-card income-card">
                     <span>Доход за месяц</span>
                     <h2 id="monthIncomeTotal">0.00 ₽</h2>
                 </div>
             </header>
-
             <div class="card">
                 <h3><i class="fas fa-plus"></i> Добавить доход</h3>
                 <div class="input-group">
-                    <select id="incomeAccountSelect"></select>
+                    <select id="incomeAccountSelect">
+                        <option value="1">🏦 Т-Банк (0.00 ₽)</option>
+                        <option value="2">💳 Сбербанк (0.00 ₽)</option>
+                        <option value="3">💵 Наличные (0.00 ₽)</option>
+                    </select>
                     <input type="number" id="incomeAmountInput" placeholder="Сумма (₽)" step="0.01">
                     <input type="text" id="incomeDescInput" placeholder="Описание">
                     <button class="btn-add btn-income" id="addIncomeBtn">
@@ -132,20 +430,27 @@
                     </button>
                 </div>
             </div>
-
             <div class="card transfer-card">
                 <h3><i class="fas fa-exchange-alt"></i> Перевод между счетами</h3>
                 <div class="input-group">
-                    <select id="transferFromSelect"></select>
+                    <select id="transferFromSelect">
+                        <option value="1">🏦 Т-Банк (0.00 ₽)</option>
+                        <option value="2">💳 Сбербанк (0.00 ₽)</option>
+                        <option value="3">💵 Наличные (0.00 ₽)</option>
+                    </select>
                     <div style="text-align: center; color: var(--text-secondary); font-size: 24px;">⬇️</div>
-                    <select id="transferToSelect"></select>
+                    <select id="transferToSelect">                        <option value="1">🏦 Т-Банк (0.00 ₽)</option>
+                        <option value="2">💳 Сбербанк (0.00 ₽)</option>
+                        <option value="3">💵 Наличные (0.00 ₽)</option>
+                    </select>
                     <input type="number" id="transferAmountInput" placeholder="Сумма (₽)" step="0.01">
                     <button class="btn-add btn-transfer" id="transferBtn">
                         <i class="fas fa-sync-alt"></i> Перевести
                     </button>
                 </div>
             </div>
-        </div>    </div>
+        </div>
+    </div>
 
     <!-- НИЖНЕЕ МЕНЮ -->
     <nav class="bottom-nav">
@@ -163,6 +468,25 @@
         </button>
     </nav>
 
-    <script src="app.js"></script>
-</body>
-</html>
+    <script>
+        // === ЧАСТЬ 2: JAVASCRIPT (внутри HTML) ===
+        console.log("✅ Встроенный JS загружен");
+
+        // Элементы DOM
+        const views = document.querySelectorAll('.view');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const totalBalanceEl = document.getElementById('totalBalance');
+        const accountsList = document.getElementById('accountsList');
+        const addAccountBtn = document.getElementById('addAccountBtn');
+        const smsTextInput = document.getElementById('smsTextInput');
+        const parseSmsBtn = document.getElementById('parseSmsBtn');
+        const accountSelect = document.getElementById('accountSelect');
+        const amountInput = document.getElementById('amountInput');
+        const categoryInput = document.getElementById('categoryInput');
+        const subcategoryInput = document.getElementById('subcategoryInput');
+        const descInput = document.getElementById('descInput');
+        const addBtn = document.getElementById('addBtn');
+        const transactionList = document.getElementById('transactionList');
+        const emptyState = document.getElementById('emptyState');
+        const periodLabel = document.getElementById('periodLabel');        const periodTotal = document.getElementById('periodTotal');
+        const monthIncomeTotal = document.getElementById('mont
