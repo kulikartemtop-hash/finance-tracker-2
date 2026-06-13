@@ -6,9 +6,7 @@
     <meta name="theme-color" content="#007aff">
     <title>Мои Финансы</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Библиотека для графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Библиотека для распознавания текста -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -47,8 +45,8 @@
                     <button class="filter-btn active" data-filter="month">Месяц</button>
                     <button class="filter-btn" data-filter="week">Неделя</button>
                     <button class="filter-btn" data-filter="today">Сегодня</button>
-                </div>            </div>
-
+                </div>
+            </div>
             <div class="card">
                 <h3>📸 Добавить расход</h3>
                 <div class="sms-parse-section">
@@ -96,9 +94,9 @@
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->    <div id="incomeView" class="view">
-        <div class="app-container">
-            <header class="header">
+    <!-- ВКЛАДКА 3: ДОХОДЫ И ПЕРЕВОДЫ -->
+    <div id="incomeView" class="view">
+        <div class="app-container">            <header class="header">
                 <h1>💸 Доходы и Переводы</h1>
                 <div class="balance-card income-card">
                     <span>Доход за месяц</span>
@@ -133,12 +131,21 @@
         </div>
     </div>
 
+    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" data-view="accountsView">🏦<br>Счета</button>
-        <button class="nav-btn" data-view="expensesView">📊<br>Расходы</button>
-        <button class="nav-btn" data-view="incomeView">💸<br>Доходы</button>
+        <button class="nav-btn active" data-view="accountsView">
+            <span>🏦</span>
+            <span>Счета</span>
+        </button>
+        <button class="nav-btn" data-view="expensesView">
+            <span>📊</span>
+            <span>Расходы</span>
+        </button>
+        <button class="nav-btn" data-view="incomeView">
+            <span>💸</span>
+            <span>Доходы</span>
+        </button>
     </nav>
-
     <script src="app.js"></script>
 </body>
 </html>
