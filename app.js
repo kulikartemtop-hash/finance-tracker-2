@@ -93,7 +93,7 @@ function saveData() {
         localStorage.setItem('finance_transactions', JSON.stringify(transactions));
         localStorage.setItem('finance_categories', JSON.stringify(customCategories));
     } catch (e) {
-        console.warn('localStorage недоступен (например, в приватном режиме)');
+        console.warn('localStorage недоступен (приватный режим)');
     }
 }
 // === NAVIGATION ===
@@ -106,7 +106,7 @@ navBtns.forEach(btn => {
     });
 });
 
-// === ACCOUNTS & GOALS ===
+// === ACCOUNTS ===
 function renderAccounts() {
     accountsList.innerHTML = '';
     let totalWorkingBalance = 0;
@@ -467,6 +467,6 @@ function renderIncomesAndTransfers() {
 
 // === START ===
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM загружен");
+    console.log("DOM готов");
     loadData();
 });
